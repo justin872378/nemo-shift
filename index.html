@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>네모의 변신 | 종이접기 큐레이션 (nemo-shift)</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+    body {
+      font-family: 'Pretendard', sans-serif;
+      background-color: #F8F9FA;
+    }
+    /* 종이 느낌의 그림자 효과 */
+    .paper-card {
+      background: #ffffff;
+      border: 1px solid #E9ECEF;
+      box-shadow: 4px 4px 0px #E2E8F0;
+      transition: all 0.2s ease-in-out;
+    }
+    .paper-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 6px 8px 0px #CBD5E1;
+    }
+    .paper-btn {
+      box-shadow: 2px 2px 0px #000000;
+      transition: all 0.1s ease;
+    }
+    .paper-btn:active {
+      transform: translate(2px, 2px);
+      box-shadow: 0px 0px 0px #000000;
+    }
+  </style>
+</head>
+<body class="text-slate-800 antialiased min-h-screen flex flex-col">
+
+  <!-- Header & Navigation -->
+  <header class="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-slate-200">
+    <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
+      <!-- Logo -->
+      <a href="#" class="flex items-center gap-2 group">
+        <div class="w-8 h-8 bg-amber-400 rounded-md flex items-center justify-center font-black text-slate-900 border border-slate-900 group-hover:rotate-12 transition-transform">
+          N
+        </div>
+        <span class="font-extrabold text-xl tracking-tight">네모의 변신 <span class="text-xs text-amber-600 font-mono">nemo-shift</span></span>
+      </a>
+
+      <!-- Menu Links -->
+      <nav class="hidden md:flex items-center gap-6 text-sm font-semibold text-slate-600">
+        <a href="#curation" class="hover:text-amber-500 transition-colors">큐레이션 모음</a>
+        <a href="#creators" class="hover:text-amber-500 transition-colors">추천 크리에이터</a>
+        <a href="#sites" class="hover:text-amber-500 transition-colors">무료 도안 사이트</a>
+      </nav>
+
+      <!-- Action Button -->
+      <button onclick="getRandomContent()" class="paper-btn bg-amber-400 hover:bg-amber-300 text-slate-900 font-bold text-sm px-4 py-2 rounded-lg border border-slate-900 flex items-center gap-2">
+        <i data-lucide="shuffle" class="w-4 h-4"></i>
+        <span>랜덤 변신</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="bg-amber-50 border-b border-amber-200/60 py-16 md:py-20 px-4">
+    <div class="max-w-4xl mx-auto text-center space-y-6">
+      <div class="inline-flex items-center gap-2 px-3 py-1 bg-amber-100 border border-amber-300 rounded-full text-xs font-bold text-amber-800 mb-2">
+        <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
+        <span>최고의 종이접기 콘텐츠 큐레이션 플랫폼</span>
+      </div>
+      <h1 class="text-3xl md:text-5xl font-extrabold text-slate-900 leading-tight">
+        평평한 네모가 만드는 세상,<br class="hidden sm:block"/>
+        <span class="text-amber-500 underline decoration-amber-300 decoration-wavy decoration-2">가장 재미있는 종이접기</span>를 추천해 드려요
+      </h1>
+      <p class="text-slate-600 text-base md:text-lg max-w-2xl mx-auto">
+        유튜브 레전드 영상부터 숨은 무료 도안 사이트까지! 인터넷에 산재된 최고의 종이접기 길잡이를 '네모의 변신'에서 찾아보세요.
+      </p>
+
+      <!-- Search & Filter Bar -->
+      <div class="pt-4 max-w-xl mx-auto">
+        <div class="relative">
+          <input type="text" id="searchInput" onkeyup="filterCards()" placeholder="검색어를 입력해보세요 (예: 공룡, 미니카, 쉬운, 크리에이터)" class="w-full pl-11 pr-4 py-3.5 rounded-xl border-2 border-slate-900 shadow-[3px_3px_0px_#000] focus:outline-none focus:ring-2 focus:ring-amber-400 text-sm">
+          <i data-lucide="search" class="w-5 h-5 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"></i>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Main Content Section -->
+  <main class="max-w-6xl mx-auto px-4 py-12 flex-1 w-full space-y-12">
+
+    <!-- Category Tabs -->
+    <div class="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none border-b border-slate-200" id="categoryFilter">
+      <button onclick="setCategory('all')" class="category-btn active px-4 py-2 rounded-lg text-sm font-bold bg-slate-900 text-white border border-slate-900 whitespace-nowrap">전체보기</button>
+      <button onclick="setCategory('creator')" class="category-btn px-4 py-2 rounded-lg text-sm font-bold bg-white text-slate-700 border border-slate-200 hover:border-slate-400 whitespace-nowrap">🎥 추천 크리에이터</button>
+      <button onclick="setCategory('site')" class="category-btn px-4 py-2 rounded-lg text-sm font-bold bg-white text-slate-700 border border-slate-200 hover:border-slate-400 whitespace-nowrap">📄 무료 도안 사이트</button>
+      <button onclick="setCategory('theme')" class="category-btn px-4 py-2 rounded-lg text-sm font-bold bg-white text-slate-700 border border-slate-200 hover:border-slate-400 whitespace-nowrap">🔥 인기 테마 모음</button>
+    </div>
+
+    <!-- Cards Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="cardContainer">
+      <!-- JavaScript로 dynamic 하게 카드 삽입 -->
+    </div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-slate-900 text-slate-400 py-10 border-t border-slate-800 mt-auto">
+    <div class="max-w-6xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-6">
+      <div class="space-y-1 text-center md:text-left">
+        <div class="font-bold text-white text-lg">네모의 변신 (nemo-shift)</div>
+        <p class="text-xs text-slate-500">본 사이트는 우수한 종이접기 크리에이터 및 웹사이트를 소개해 주는 큐레이션 서비스입니다.</p>
+      </div>
+      <div class="flex items-center gap-4 text-xs">
+        <a href="https://github.com" target="_blank" class="hover:text-white transition-colors flex items-center gap-1">
+          <i data-lucide="github" class="w-4 h-4"></i> GitHub Repository
+        </a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Modal for Random Shift -->
+  <div id="randomModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white border-2 border-slate-900 rounded-2xl max-w-md w-full p-6 space-y-4 shadow-[8px_8px_0px_#000] relative">
+      <button onclick="closeModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-900">
+        <i data-lucide="x" class="w-6 h-6"></i>
+      </button>
+      <div class="inline-block px-3 py-1 bg-amber-100 text-amber-800 rounded-full text-xs font-bold">🎲 오늘의 랜덤 변신</div>
+      <h3 id="modalTitle" class="text-xl font-extrabold text-slate-900"></h3>
+      <p id="modalDesc" class="text-slate-600 text-sm"></p>
+      <div id="modalTags" class="flex flex-wrap gap-1.5 pt-2"></div>
+      <a id="modalLink" href="#" target="_blank" class="paper-btn block w-full text-center bg-amber-400 hover:bg-amber-300 text-slate-900 font-bold py-3 rounded-xl border border-slate-900">
+        해당 페이지로 이동하기
+      </a>
+    </div>
+  </div>
+
+  <!-- JavaScript Logic -->
+  <script>
+    // 큐레이션 데이터 모음 (JSON)
+    const items = [
+      {
+        id: 1,
+        title: "네모아저씨 (Sam Origami)",
+        category: "creator",
+        target: "어린이/입문",
+        type: "유튜브 채널",
+        desc: "미니카, 팽이 종이접기의 대명사! 명확한 설명과 알기 쉬운 손동작으로 아이들과 입문자에게 최고인 채널.",
+        url: "https://www.youtube.com",
+        tags: ["미니카", "팽이", "어린이", "쉬운접기"],
+        badgeColor: "bg-red-100 text-red-700 border-red-200"
+      },
+      {
+        id: 2,
+        title: "Origami Japan (오리가미 클럽)",
+        category: "site",
+        target: "전연령",
+        type: "무료 도안 사이트",
+        desc: "카테고리별 엄청난 분량의 2D/3D 애니메이션 도안을 제공하는 일본의 전통 종이접기 대표 사이트.",
+        url: "https://www.origami-club.com",
+        tags: ["무료도안", "입체안내", "동물", "전통"],
+        badgeColor: "bg-blue-100 text-blue-700 border-blue-200"
+      },
+      {
+        id: 3,
+        title: "Tadashi Mori",
+        category: "creator",
+        target: "고급/중급",
+        type: "유튜브 채널",
+        desc: "드래곤, 입체 캐릭터 등 고난이도 작품을 상세한 각도와 명확한 영어 설명으로 보여주는 글로벌 크리에이터.",
+        url: "https://www.youtube.com",
+        tags: ["드래곤", "고난이도", "입체", "글로벌"],
+        badgeColor: "bg-purple-100 text-purple-700 border-purple-200"
+      },
+      {
+        id: 4,
+        title: "Origami-instructions.com",
+        category: "site",
+        target: "입문/중급",
+        type: "사진 도안 웹사이트",
+        desc: "모든 단계를 고화질 실제 사진으로 한 단계씩 설명해 주는 영문 가이드 웹사이트.",
+        url: "http://www.origami-instructions.com",
+        tags: ["사진가이드", "쉬운영어", "생활소품"],
+        badgeColor: "bg-emerald-100 text-emerald-700 border-emerald-200"
+      },
+      {
+        id: 5,
+        title: "전설의 공룡 종이접기 모음집",
+        category: "theme",
+        target: "어린이/매니아",
+        type: "테마 컬렉션",
+        desc: "티라노사우루스부터 트리케라톱스까지, 인기도 높은 공룡 접기 영상들을 엄선한 테마 컬렉션.",
+        url: "#",
+        tags: ["공룡", "티라노", "인기모음"],
+        badgeColor: "bg-amber-100 text-amber-700 border-amber-200"
+      },
+      {
+        id: 6,
+        title: "Jo Nakashima",
+        category: "creator",
+        target: "중급/성인취미",
+        type: "유튜브 채널",
+        desc: "깔끔한 3D 그래픽 다이어그램과 손 촬영을 동시에 제공하여 시각적으로 가장 보기 편한 채널 중 하나.",
+        url: "https://www.youtube.com",
+        tags: ["깔끔한편집", "움직이는종이", "동물"],
+        badgeColor: "bg-rose-100 text-rose-700 border-rose-200"
+      }
+    ];
+
+    let currentCategory = 'all';
+
+    // 카드 렌더링
+    function renderCards(data) {
+      const container = document.getElementById('cardContainer');
+      container.innerHTML = '';
+
+      if (data.length === 0) {
+        container.innerHTML = `
+          <div class="col-span-full text-center py-12 text-slate-400">
+            <i data-lucide="frown" class="w-12 h-12 mx-auto mb-3 opacity-50"></i>
+            <p class="text-base font-semibold">검색 결과가 없습니다.</p>
+          </div>
+        `;
+        lucide.createIcons();
+        return;
+      }
+
+      data.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'paper-card rounded-2xl p-6 flex flex-col justify-between';
+        card.innerHTML = `
+          <div class="space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold px-2.5 py-1 rounded-md border ${item.badgeColor}">${item.type}</span>
+              <span class="text-xs text-slate-400 font-medium">${item.target}</span>
+            </div>
+            <h3 class="text-lg font-bold text-slate-900 hover:text-amber-600 transition-colors">
+              <a href="${item.url}" target="_blank">${item.title}</a>
+            </h3>
+            <p class="text-slate-600 text-sm leading-relaxed">${item.desc}</p>
+          </div>
+          <div class="pt-6 space-y-4">
+            <div class="flex flex-wrap gap-1.5">
+              ${item.tags.map(tag => `<span class="text-[11px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-medium">#${tag}</span>`).join('')}
+            </div>
+            <a href="${item.url}" target="_blank" class="paper-btn block text-center bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs py-2.5 rounded-lg border border-slate-900 flex items-center justify-center gap-1.5">
+              <span>바로가기</span>
+              <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
+            </a>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+
+      lucide.createIcons();
+    }
+
+    // 카테고리 필터링
+    function setCategory(cat) {
+      currentCategory = cat;
+      const buttons = document.querySelectorAll('.category-btn');
+      buttons.forEach(btn => {
+        btn.classList.remove('bg-slate-900', 'text-white');
+        btn.classList.add('bg-white', 'text-slate-700');
+      });
+
+      event.target.classList.remove('bg-white', 'text-slate-700');
+      event.target.classList.add('bg-slate-900', 'text-white');
+
+      filterCards();
+    }
+
+    // 검색 및 통합 필터링
+    function filterCards() {
+      const keyword = document.getElementById('searchInput').value.toLowerCase();
+      const filtered = items.filter(item => {
+        const matchesCategory = currentCategory === 'all' || item.category === currentCategory;
+        const matchesKeyword = item.title.toLowerCase().includes(keyword) ||
+                               item.desc.toLowerCase().includes(keyword) ||
+                               item.tags.some(tag => tag.toLowerCase().includes(keyword));
+        return matchesCategory && matchesKeyword;
+      });
+      renderCards(filtered);
+    }
+
+    // 랜덤 추천 모달
+    function getRandomContent() {
+      const randomIndex = Math.floor(Math.random() * items.length);
+      const randomItem = items[randomIndex];
+
+      document.getElementById('modalTitle').innerText = randomItem.title;
+      document.getElementById('modalDesc').innerText = randomItem.desc;
+      document.getElementById('modalLink').href = randomItem.url;
+      
+      const tagsContainer = document.getElementById('modalTags');
+      tagsContainer.innerHTML = randomItem.tags.map(tag => `<span class="text-xs bg-amber-50 text-amber-800 border border-amber-200 px-2 py-1 rounded font-medium">#${tag}</span>`).join('');
+
+      document.getElementById('randomModal').classList.remove('hidden');
+    }
+
+    function closeModal() {
+      document.getElementById('randomModal').classList.add('hidden');
+    }
+
+    // 초기화
+    document.addEventListener('DOMContentLoaded', () => {
+      renderCards(items);
+    });
+  </script>
+</body>
+</html>
