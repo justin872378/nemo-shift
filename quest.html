@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>네모의 변신 - 종이접기 도장깨기 퀘스트</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Inter & Noto Sans KR -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: #f8fafc;
+            background-image: 
+                radial-gradient(#e2e8f0 1.5px, transparent 1.5px), 
+                radial-gradient(#e2e8f0 1.5px, #f8fafc 1.5px);
+            background-size: 30px 30px;
+            background-position: 0 0, 15px 15px;
+        }
+
+        /* Paper crease & origami shadow utility classes */
+        .paper-shadow {
+            box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.08), 0 8px 10px -6px rgba(15, 23, 42, 0.04);
+        }
+        
+        .paper-crease {
+            position: relative;
+        }
+        .paper-crease::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(135deg, rgba(255,255,255,0.4) 0%, rgba(0,0,0,0.03) 100%);
+            pointer-events: none;
+            border-radius: inherit;
+        }
+
+        /* SVG Path animations & styles */
+        .roadmap-path-bg {
+            stroke: #cbd5e1;
+            stroke-dasharray: 8, 8;
+            stroke-width: 6;
+            fill: none;
+        }
+
+        .roadmap-path-active {
+            stroke: #f59e0b;
+            stroke-width: 8;
+            fill: none;
+            stroke-linecap: round;
+            transition: stroke-dashoffset 0.8s ease-in-out;
+        }
+
+        /* Stamp animation */
+        @keyframes stamp-pop {
+            0% { transform: scale(3) rotate(-20deg); opacity: 0; }
+            50% { transform: scale(0.9) rotate(-10deg); opacity: 1; }
+            75% { transform: scale(1.05) rotate(-12deg); }
+            100% { transform: scale(1) rotate(-12deg); opacity: 0.9; }
+        }
+        
+        .stamp-animated {
+            animation: stamp-pop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+    </style>
+</head>
+<body class="text-slate-800 min-h-screen flex flex-col justify-between">
+
+    <!-- Navigation Header -->
+    <header class="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-slate-200/80 paper-shadow">
+        <div class="max-w-5xl mx-auto px-4 py-3.5 flex items-center justify-between">
+            <!-- Logo -->
+            <a href="index.html" class="flex items-center gap-2.5 group">
+                <div class="w-9 h-9 bg-amber-500 text-white flex items-center justify-center rounded-lg shadow-md transform group-hover:rotate-12 transition-transform duration-300">
+                    <i class="fa-solid fa-paper-plane text-lg"></i>
+                </div>
+                <span class="text-xl font-black text-slate-800 tracking-tight">nemo-shift <span class="text-amber-500 font-normal text-sm">| 네모의 변신</span></span>
+            </a>
+
+            <!-- Menu Links -->
+            <nav class="hidden md:flex items-center gap-6 text-sm font-bold text-slate-600">
+                <a href="index.html" class="hover:text-amber-500 transition-colors">홈 (색인)</a>
+                <a href="recommend.html" class="hover:text-amber-500 transition-colors">오늘의 추천</a>
+                <a href="quest.html" class="text-amber-500 border-b-2 border-amber-500 pb-0.5">도장깨기 퀘스트 🏆</a>
+            </nav>
+
+            <!-- Reset Stats Button -->
+            <button id="reset-btn" onclick="confirmReset()" class="text-xs text-slate-400 hover:text-rose-500 flex items-center gap-1 transition-colors px-2.5 py-1.5 rounded-lg border border-slate-200 hover:border-rose-200">
+                <i class="fa-solid fa-rotate-left"></i>
+                <span>기록 초기화</span>
+            </button>
+        </div>
+
+        <!-- Quest Overall Progress Bar -->
+        <div class="bg-slate-100 border-t border-slate-200/60 py-2">
+            <div class="max-w-5xl mx-auto px-4 flex items-center gap-4">
+                <div class="text-xs font-bold text-slate-600 whitespace-nowrap flex items-center gap-1.5">
+                    <i class="fa-solid fa-award text-amber-500 text-sm"></i>
+                    <span>전체 달성도: <span id="progress-text" class="text-amber-600 font-extrabold">0/20</span></span>
+                </div>
+                <div class="flex-1 bg-slate-200 h-3 rounded-full overflow-hidden p-0.5 shadow-inner">
+                    <div id="progress-bar" class="bg-gradient-to-r from-amber-400 to-amber-500 h-full rounded-full transition-all duration-500" style="width: 0%;"></div>
+                </div>
+                <span id="progress-percent" class="text-xs font-black text-slate-700 w-10 text-right">0%</span>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-4xl mx-auto px-4 py-8 flex-1 w-full relative">
+        <!-- Hero Title Banner -->
+        <div class="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200/80 rounded-2xl p-6 mb-12 text-center paper-shadow relative overflow-hidden paper-crease">
+            <div class="absolute -right-6 -bottom-6 text-amber-200/40 text-9xl pointer-events-none select-none">
+                <i class="fa-solid fa-origami"></i>
+            </div>
+            <span class="inline-block px-3 py-1 bg-amber-500 text-white text-xs font-extrabold rounded-full mb-2 shadow-sm">
+                LEVEL-UP ROADMAP
+            </span>
+            <h1 class="text-2xl sm:text-3xl font-black text-slate-800 tracking-tight mb-2">
+                📜 종이접기 도장깨기 퀘스트
+            </h1>
+            <p class="text-sm text-slate-600 max-w-lg mx-auto leading-relaxed">
+                구불구불 종이 접기 길을 따라 레벨 1부터 20까지 차근차근 도장깨기에 도전해보세요! 단계별 미션을 수행하고 나만의 종이접기 마스터 도장을 모아보세요.
+            </p>
+        </div>
+
+        <!-- Roadmap Winding Path SVG & Container -->
+        <div id="roadmap-container" class="relative w-full py-6 min-h-[2200px]">
+            <!-- Dynamic Connecting Line Canvas/SVG -->
+            <svg id="roadmap-svg" class="absolute top-0 left-0 w-full h-full pointer-events-none z-0">
+                <path id="svg-bg-path" class="roadmap-path-bg" d="" />
+                <path id="svg-active-path" class="roadmap-path-active" d="" />
+            </svg>
+
+            <!-- 20 Checkpoint Nodes Container -->
+            <div id="nodes-container" class="relative z-10 w-full">
+                <!-- Javascript will dynamically inject 20 paper-themed milestone nodes here -->
+            </div>
+        </div>
+    </main>
+
+    <!-- Paper-Styled Modal Drawer for Level Details -->
+    <div id="quest-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl border-2 border-slate-200 w-full max-w-md p-6 paper-shadow relative transform transition-all scale-95 opacity-0 duration-200 paper-crease" id="modal-card">
+            
+            <!-- Close Button -->
+            <button onclick="closeModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center transition-colors">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            <!-- Modal Content Slot -->
+            <div id="modal-body" class="space-y-4">
+                <!-- Dynamic Content Injected Here -->
+            </div>
+
+            <!-- Modal Action Buttons -->
+            <div class="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between gap-3">
+                <button onclick="closeModal()" class="px-4 py-2.5 rounded-xl border border-slate-200 text-slate-600 font-bold text-sm hover:bg-slate-50 transition-colors flex-1">
+                    닫기
+                </button>
+                <button id="toggle-complete-btn" class="px-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-bold text-sm shadow-md transition-all flex-1 flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-stamp"></i>
+                    <span id="toggle-btn-text">도장 찍기 (완료)</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-slate-200 mt-16 py-6 text-center text-xs text-slate-500">
+        <div class="max-w-5xl mx-auto px-4 space-y-2">
+            <p class="font-bold text-slate-700">nemo-shift (네모의 변신) — 종이접기 큐레이션 플랫폼</p>
+            <p>© 2026. 수작업으로 정성껏 모은 종이접기 데이터베이스 기반 레벨업 로드맵.</p>
+        </div>
+    </footer>
+<script>
+    /* 
+     * 1단계부터 13단계까지 수집된 작품 데이터
+     */
+    const manualQuestData = [
+      {
+        id: 1,
+        title: "움직이는 장난감-칼 접기, 쉬운 종이접기",
+        level: "Lv.1 입문",
+        creator: "색종이 연구소 origami",
+        target: "쉬운 접기 / 색종이 1장",
+        desc: "색종이 1장으로 쉽게 만들어 가지고 놀 수 있는 움직이는 장난감 칼, 검 접기 방법입니다.",
+        thumbnail: "https://img.youtube.com/vi/JGflVaoYXSY/hqdefault.jpg",
+        url: "https://youtu.be/JGflVaoYXSY?si=TSynjvmfqO05rOnj",
+        tags: ["칼", "움직이는", "색종이1장"]
+      },
+      {
+        id: 2,
+        title: "쉬운 하트 요술봉 종이접기/Easy origami magic wand",
+        level: "Lv.1 입문",
+        creator: "색종이 연구소 origami",
+        target: "입문 / 쉬운접기",
+        desc: "색종이로 장난감 만들기! 색종이 2장으로 만드는 예쁜 요술봉입니다.",
+        thumbnail: "https://img.youtube.com/vi/ZUjBGPYdnec/hqdefault.jpg",
+        url: "https://www.youtube.com/watch?v=ZUjBGPYdnec",
+        tags: ["요술봉", "색종이2장", "장난감"]
+      },
+      {
+        id: 3,
+        title: "색종이로 노랑이(인간형캐릭터) 접는방법(사람 종이접기)",
+        level: "Lv.2 초급",
+        creator: "네모아저씨",
+        target: "중급 / 캐릭터",
+        desc: "스티브나 좀비 같은 마인크래프트 캐릭터의 기본이 되는 인간형 종이접기 노랑이 접는 방법입니다.",
+        thumbnail: "https://img.youtube.com/vi/d9YF2_1FnAU/hqdefault.jpg",
+        url: "https://www.youtube.com/watch?v=d9YF2_1FnAU",
+        tags: ["색종이", "사람"]
+      },
+      {
+        id: 4,
+        title: "[종이쌤 창작] 역대급 미니카! 드래곤 날개를 가진 드래곤 미니카접기 !",
+        level: "Lv.2 초급",
+        creator: "종이쌤",
+        target: "초급 / 미니카",
+        desc: "색종이 한 장으로 접는 완전 멋있는 드래곤 미니카 종이접기입니다.",
+        thumbnail: "https://img.youtube.com/vi/S-h8-JcBMsk/hqdefault.jpg",
+        url: "https://www.youtube.com/watch?v=S-h8-JcBMsk",
+        tags: ["드래곤", "미니카", "날개"]
+      },
+      {
+        id: 5,
+        title: "색종이로 도마뱀 접는방법(종이접기) / 네모아저씨 (Origami Lizard )",
+        level: "Lv.2 초급",
+        creator: "네모아저씨",
+        target: "중급 / 동물",
+        desc: "색종이 한 장을 접기만 해서 입체 도마뱀을 완성해 보는 재미있는 동물 종이접기입니다.",
+        thumbnail: "https://img.youtube.com/vi/o8kuqZHkhaM/hqdefault.jpg",
+        url: "https://www.youtube.com/watch?v=o8kuqZHkhaM",
+        tags: ["색종이", "도마뱀"]
+      },
+      {
+        id: 6,
+        title: "멋지고 쉬운 용 종이 접기/ Easy origami dragon.",
+        level: "Lv.3 중급",
+        creator: "색종이 연구소",
+        target: "쉬운 / 용·전설",
+        desc: "색종이 1장으로 용 접기! 용 길들이기는 못하지만 용접기는 할 수 있어요~",
+        thumbnail: "https://img.youtube.com/vi/hq_S_T715UA/hqdefault.jpg",
+        url: "https://www.youtube.com/watch?v=hq_S_T715UA",
+        tags: ["용", "멋지고 쉬운"]
+      },
+      {
+        id: 7,
+        title: "[풀있어야됨] \"딱지\"에서 \"큐브\"로 변신하는 \"매직큐브\" 접는방법(Origami transformation magic cube)",
+        level: "Lv.3 중급",
+        creator: "네모아저씨",
+        target: "중급 / 장난감",
+        desc: "딱지에서 큐브로 변하는 매직큐브에요. 색종이는 2장이 필요하고 풀도 있어야 된답니다. 종이접기이면서 만들기이기도 해요!",
+        thumbnail: "https://img.youtube.com/vi/n1IJuzn9xno/hqdefault.jpg",
+        url: "https://www.youtube.com/watch?v=n1IJuzn9xno",
+        tags: ["매직큐브", "딱지"]
+      },
+      {
+        id: 8,
+        title: "Tesla Cyber Truck 테슬라 사이버 트럭 종이접기 / 자동차 접기 / car origami",
+        level: "Lv.3 중급",
+        creator: "종이접는 도토리",
+        target: "쉬움 / 탈것",
+        desc: "테슬라의 사이버트럭 살 수 없다면 종이로 만든다!! 색종이 한장으로 사이버트럭을 만들어 봤습니다. 미래지향적인 디자인이 굉장히 마음에 드는 자동차죠. 각진 부분이 가장 큰 특징입니다.",
+        thumbnail: "https://img.youtube.com/vi/tzUx2uK4YMY/hqdefault.jpg",
+        url: "https://www.youtube.com/watch?v=tzUx2uK4YMY",
+        tags: ["테슬라 사이버 트럭", "자동차"]
+      },
+      {
+        id: 9,
+        title: "학접기 블록 접기",
+        level: "Lv.3 중급",
+        creator: "페이퍼빌드",
+        target: "기초 / 블록",
+        desc: "페이퍼빌드 학접기 블록 접기로 기초를 다져봅시다!",
+        thumbnail: "https://img.youtube.com/vi/5saMIOJHo4o/hqdefault.jpg",
+        url: "https://www.youtube.com/watch?v=5saMIOJHo4o",
+        tags: ["학접기", "기초"]
+      },
+      {
+        id: 10,
+        title: "어몽어스 로봇 만드는 방법 (종이접기) 페이퍼빌드",
+        level: "Lv.4 상급",
+        creator: "페이퍼빌드",
+        target: "고급 / 캐릭터",
+        desc: "요즘 인기인 어몽어스의 로봇 버전 종이접기입니다. 만들어달라는 요청이 너무 많아서 한번 해봤습니다. 만들다보니 욕심이 생겨서 난이도가 조금 있습니다.",
+        thumbnail: "https://img.youtube.com/vi/jhCPvdzv1uw/hqdefault.jpg",
+        url: "https://www.youtube.com/watch?v=jhCPvdzv1uw",
+        tags: ["어몽어스", "로봇", "페이퍼빌드"]
+      },
+      {
+        id: 11,
+        title: "종이접기 초급 상어 만들기 블루샤크 (페이퍼빌드)",
+        level: "Lv.4 상급",
+        creator: "페이퍼빌드",
+        target: "초급 / 동물",
+        desc: "페이퍼빌드 종이접기 초급난이도 상어 만들기입니다.",
+        thumbnail: "https://img.youtube.com/vi/DWbUuelNO2g/hqdefault.jpg",
+        url: "https://www.youtube.com/watch?v=DWbUuelNO2g",
+        tags: ["상어", "초급 난이도"]
+      },
+      {
+        id: 12,
+        title: "[신작!!!] 종이접기 로봇 빌드 SD 뼈대 접기 페이퍼빌드",
+        level: "Lv.4 상급",
+        creator: "페이퍼빌드",
+        target: "중급 / 로봇",
+        desc: "종이로봇을 SD화 시켜봤습니다!. 블럭고 적고 만들기 쉽고 생각보다 멋지네요",
+        thumbnail: "https://img.youtube.com/vi/U53R2kT7lxc/hqdefault.jpg",
+        url: "https://www.youtube.com/watch?v=U53R2kT7lxc",
+        tags: ["SD", "로봇", "신작"]
+      },
+      {
+        id: 13,
+        title: "전설의 포켓몬 아르세우스 종이접기 (페이퍼빌드)",
+        level: "Lv.5 마스터",
+        creator: "페이퍼빌드",
+        target: "중고급 / 포켓몬",
+        desc: "이번 페이퍼빌드 종이접기는 요청이 가장 많은 아르세우스입니다.",
+        thumbnail: "https://img.youtube.com/vi/JTrCc9jBeBc/hqdefault.jpg",
+        url: "https://www.youtube.com/watch?v=JTrCc9jBeBc",
+        tags: ["아르세우스", "포켓몬"]
+      },
+      {
+        id: 14,
+        title: "전설의 포켓몬 기라티나 종이접기 (페이퍼빌드)",
+        level: "Lv.5 마스터",
+        creator: "페이퍼빌드",
+        target: "고급 / 포켓몬",
+        desc: "드래곤 접다보니 어디서 본것같은 포켓몬이?? 이번엔 전설 포켓몬 기라티나 종이접기입니다.",
+        thumbnail: "https://img.youtube.com/vi/BfbayznZvnE/hqdefault.jpg",
+        url: "https://www.youtube.com/watch?v=BfbayznZvnE",
+        tags: ["기라티나", "포켓몬"]
+      },
+      {
+        id: 15,
+        title: "주술회전 마허라 종이접기 로봇 (페이퍼빌드,타이탄뼈대)",
+        level: "Lv.5 마스터",
+        creator: "페이퍼빌드",
+        target: "고급 / 로봇·캐릭터",
+        desc: "주술회전에 등장하는 마허라입니다. 난이도를 줄이긴했지만 그래도 조금 어렵네요! 도전해보세요",
+        thumbnail: "https://img.youtube.com/vi/PJLoCaVZRwo/hqdefault.jpg",
+        url: "https://www.youtube.com/watch?v=PJLoCaVZRwo",
+        tags: ["마허라", "주술회전"]
+      },
+      {
+        id: 16,
+        title: "[페빌](중급) 새시리즈 종이로봇 빌드나이트2 나이트 제로 (필수뼈대 강의 , 페이퍼빌드)",
+        level: "Lv.3 중급",
+        creator: "페이퍼빌드",
+        target: "중급 / 로봇",
+        desc: "좋아요 수가 많을수록 다음 시리즈늘어납니다.",
+        thumbnail: "https://img.youtube.com/vi/cGt__QAk4TY/hqdefault.jpg",
+        url: "https://www.youtube.com/watch?v=cGt__QAk4TY",
+        tags: ["중급", "새시리즈", "빌드나이트2"]
+      },
+      {
+        id: 17,
+        title: "[페빌]중급 종이로봇 빌드포스2 포스어쌔신",
+        level: "Lv.3 중급",
+        creator: "페이퍼빌드",
+        target: "중급 / 로봇",
+        desc: "빌드x 의 뼈대 강의처럼 뼈대 강의를 통합하기로 했습니다. 모든 포스2 시리즈 뼈대는 이 강의를 보고 제작해주세요.",
+        thumbnail: "https://img.youtube.com/vi/oRKLJwXar18/hqdefault.jpg",
+        url: "https://www.youtube.com/watch?v=oRKLJwXar18",
+        tags: ["빌드포스x", "어쌔신"]
+      },
+      {
+        id: 18,
+        title: "건담 에어리얼 개수형 만드는 영상 | 건담 수성의 마녀",
+        level: "Lv.5 마스터",
+        creator: "페이퍼빌드",
+        target: "고급 / 로봇·건담",
+        desc: "건담 수성의 마녀라는 애니메이션에 등장하는 건담 에어리얼의 개수형입니다.",
+        thumbnail: "https://img.youtube.com/vi/Y_YXVLRYBls/hqdefault.jpg",
+        url: "https://www.youtube.com/watch?v=Y_YXVLRYBls",
+        tags: ["에어리얼", "건담 수성의 마녀"]
+      }
+    ];
+
+    /* 
+     * 총 20개 노드로 확장 (수집된 18개 + 남은 2개 빈 슬롯 자동 생성)
+     */
+    const questData = Array.from({ length: 20 }, (_, i) => {
+        const levelNum = i + 1;
+        let xOffset = 50; 
+        if (i % 4 === 1) xOffset = 22;      // Left shift
+        else if (i % 4 === 3) xOffset = 78; // Right shift
+
+        // 수집된 데이터가 있으면 그 데이터를 사용하고, 없으면 빈 슬롯 생성
+        const existingItem = manualQuestData.find(item => item.id === levelNum);
+
+        if (existingItem) {
+            return {
+                ...existingItem,
+                difficulty: levelNum <= 5 ? '초급 (입문)' : levelNum <= 12 ? '중급 (장난감)' : levelNum <= 17 ? '고급 (로봇/캐릭터)' : '마스터 (전설)',
+                xPct: xOffset,
+                yPx: i * 110 + 40
+            };
+        } else {
+            return {
+                id: levelNum,
+                title: `Level ${levelNum}: 작품 준비 중`,
+                level: 'Lv.5 마스터',
+                creator: '크리에이터 미정',
+                difficulty: '마스터 (전설)',
+                target: '미정',
+                desc: '추후 수집 및 등록될 종이접기 퀘스트 작품 슬롯입니다.',
+                thumbnail: '',
+                url: '#',
+                tags: ['종이접기', `단계${levelNum}`],
+                xPct: xOffset,
+                yPx: i * 110 + 40
+            };
+        }
+    });
+
+    /* 
+     * LocalStorage State Management & Initialization
+     */
+    const STORAGE_KEY = 'nemo_shift_quest_progress_v1';
+    let completedSet = new Set(JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'));
+    let activeModalLevelId = null;
+
+    document.addEventListener('DOMContentLoaded', () => {
+        renderRoadmapNodes();
+        updateRoadmapPath();
+        updateProgress();
+
+        window.addEventListener('resize', updateRoadmapPath);
+    });
+
+    /* 
+     * Render 20 Milestone Checkpoints on Page
+     */
+    function renderRoadmapNodes() {
+        const container = document.getElementById('nodes-container');
+        if (!container) return;
+        container.innerHTML = '';
+
+        questData.forEach((node, idx) => {
+            const isCompleted = completedSet.has(node.id);
+            const isUnlocked = node.id === 1 || completedSet.has(node.id - 1);
+
+            const nodeEl = document.createElement('div');
+            nodeEl.className = 'absolute transform -translate-x-1/2 -translate-y-1/2 transition-all duration-300';
+            nodeEl.style.left = `${node.xPct}%`;
+            nodeEl.style.top = `${node.yPx}px`;
+
+            let buttonStyle = 'bg-slate-200 text-slate-400 border-slate-300 cursor-not-allowed opacity-80';
+            let iconHtml = `<i class="fa-solid fa-lock text-slate-400"></i>`;
+            let badgeClass = 'bg-slate-100 text-slate-500 border-slate-200';
+
+            if (isCompleted) {
+                buttonStyle = 'bg-emerald-500 text-white border-emerald-600 shadow-lg shadow-emerald-500/30 hover:scale-110';
+                iconHtml = `<i class="fa-solid fa-check text-xl"></i>`;
+                badgeClass = 'bg-emerald-50 text-emerald-700 border-emerald-200 font-bold';
+            } else if (isUnlocked) {
+                buttonStyle = 'bg-amber-500 text-white border-amber-600 shadow-xl shadow-amber-500/40 hover:scale-110 animate-bounce';
+                iconHtml = `<i class="fa-solid fa-paper-plane text-lg"></i>`;
+                badgeClass = 'bg-amber-50 text-amber-700 border-amber-300 font-extrabold';
+            }
+
+            nodeEl.innerHTML = `
+                <div class="flex flex-col items-center group">
+                    <button onclick="openModal(${node.id})" 
+                            ${!isUnlocked ? 'disabled' : ''} 
+                            class="w-14 h-14 rounded-2xl border-2 flex items-center justify-center transition-transform duration-200 paper-shadow relative z-10 cursor-pointer ${buttonStyle}">
+                        ${iconHtml}
+                        ${isCompleted ? '<div class="absolute -top-2 -right-2 bg-emerald-600 text-[10px] font-black text-white px-1.5 py-0.5 rounded-full shadow">완료</div>' : ''}
+                    </button>
+
+                    <div class="mt-2 text-center bg-white/90 backdrop-blur-sm border border-slate-200/80 px-3 py-1.5 rounded-xl shadow-sm max-w-[160px] paper-crease">
+                        <span class="inline-block px-1.5 py-0.5 text-[10px] rounded border mb-1 ${badgeClass}">
+                            LV.${node.id}
+                        </span>
+                        <p class="text-xs font-bold text-slate-800 truncate leading-snug">${node.title}</p>
+                    </div>
+                </div>
+            `;
+
+            container.appendChild(nodeEl);
+        });
+    }
+
+    /* 
+     * Draw SVG Winding Path Connecting All 20 Points
+     */
+    function updateRoadmapPath() {
+        const svgBgPath = document.getElementById('svg-bg-path');
+        const container = document.getElementById('roadmap-container');
+        if (!container || !svgBgPath) return;
+
+        const containerWidth = container.offsetWidth;
+        let pathD = '';
+
+        questData.forEach((node, i) => {
+            const x = (node.xPct / 100) * containerWidth;
+            const y = node.yPx;
+
+            if (i === 0) {
+                pathD += `M ${x} ${y}`;
+            } else {
+                const prevNode = questData[i - 1];
+                const prevX = (prevNode.xPct / 100) * containerWidth;
+                const prevY = prevNode.yPx;
+
+                const cy1 = prevY + 55;
+                const cy2 = y - 55;
+
+                pathD += ` C ${prevX} ${cy1}, ${x} ${cy2}, ${x} ${y}`;
+            }
+        });
+
+        svgBgPath.setAttribute('d', pathD);
+    }
+
+    /* 
+     * Update Completion Progress & Stats
+     */
+    function updateProgress() {
+        const count = completedSet.size;
+        const percent = Math.round((count / 20) * 100);
+
+        const textEl = document.getElementById('progress-text');
+        const percentEl = document.getElementById('progress-percent');
+        const barEl = document.getElementById('progress-bar');
+
+        if (textEl) textEl.innerText = `${count} / 20`;
+        if (percentEl) percentEl.innerText = `${percent}%`;
+        if (barEl) barEl.style.width = `${percent}%`;
+    }
+
+    /* 
+     * Modal Drawer Open/Close & Level Detail Interactivity
+     */
+    function openModal(levelId) {
+        const node = questData.find(n => n.id === levelId);
+        if (!node) return;
+
+        activeModalLevelId = levelId;
+        const isCompleted = completedSet.has(levelId);
+
+        const modalBody = document.getElementById('modal-body');
+        const toggleBtnText = document.getElementById('toggle-btn-text');
+        const toggleBtn = document.getElementById('toggle-complete-btn');
+
+        let thumbnailHtml = '';
+        if (node.thumbnail) {
+            thumbnailHtml = `
+                <div class="relative group aspect-video bg-slate-100 rounded-xl overflow-hidden border-2 border-slate-900 shadow-inner mb-3">
+                    <img src="${node.thumbnail}" alt="${node.title}" class="w-full h-full object-cover">
+                    ${node.url && node.url !== '#' ? `
+                    <a href="${node.url}" target="_blank" class="absolute inset-0 bg-slate-900/30 flex items-center justify-center opacity-90 hover:opacity-100 transition-opacity">
+                        <div class="w-12 h-12 bg-amber-400 border-2 border-slate-900 rounded-full flex items-center justify-center text-slate-900 shadow-[2px_2px_0px_#000]">
+                            <i class="fa-solid fa-play ml-0.5"></i>
+                        </div>
+                    </a>` : ''}
+                </div>
+            `;
+        } else {
+            thumbnailHtml = `
+                <div class="bg-slate-100 border border-slate-200 rounded-xl p-4 text-center my-3">
+                    <i class="fa-solid fa-box-open text-3xl mb-2 block text-slate-400"></i>
+                    <p class="text-xs font-bold text-slate-600">추후 추천 데이터 수집 슬롯</p>
+                    <p class="text-[11px] text-slate-400 mt-1">유튜브 동영상 썸네일 대기 중</p>
+                </div>
+            `;
+        }
+
+        modalBody.innerHTML = `
+            <div class="flex items-center gap-2 mb-1">
+                <span class="bg-amber-100 text-amber-800 text-xs font-black px-2.5 py-1 rounded-md">LEVEL ${node.id}</span>
+                <span class="bg-slate-100 text-slate-600 text-xs font-bold px-2.5 py-1 rounded-md">${node.difficulty}</span>
+            </div>
+            <h3 class="text-xl font-black text-slate-800 tracking-tight leading-snug">${node.title}</h3>
+            <p class="text-xs text-slate-500 font-semibold mb-2"><i class="fa-regular fa-user mr-1"></i>${node.creator}</p>
+            
+            ${thumbnailHtml}
+
+            <p class="text-xs text-slate-600 leading-relaxed bg-amber-50/50 p-3 rounded-lg border border-amber-100/80 mb-3">
+                ${node.desc}
+            </p>
+
+            ${node.url && node.url !== '#' ? `
+            <a href="${node.url}" target="_blank" class="paper-btn block text-center bg-amber-400 hover:bg-amber-300 text-slate-900 font-extrabold text-xs py-2.5 rounded-xl border-2 border-slate-900 flex items-center justify-center gap-2 mb-3">
+                <span>유튜브에서 영상 보기</span>
+                <i class="fa-solid fa-external-link-alt"></i>
+            </a>` : ''}
+
+            <div>
+                ${isCompleted 
+                    ? `<div class="bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-bold px-3 py-2 rounded-xl flex items-center gap-2">
+                        <i class="fa-solid fa-circle-check text-emerald-600 text-sm"></i>
+                        <span>이 단계의 종이접기 도장을 이미 수집했습니다!</span>
+                       </div>`
+                    : `<div class="bg-slate-50 border border-slate-200 text-slate-600 text-xs font-medium px-3 py-2 rounded-xl flex items-center gap-2">
+                        <i class="fa-solid fa-circle-info text-amber-500 text-sm"></i>
+                        <span>종이접기를 완료하셨다면 아래 버튼을 누르세요.</span>
+                       </div>`
+                }
+            </div>
+        `;
+
+        if (isCompleted) {
+            if (toggleBtnText) toggleBtnText.innerText = '도장 취소하기';
+            if (toggleBtn) toggleBtn.className = 'px-4 py-2.5 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold text-sm transition-all flex-1 flex items-center justify-center gap-2';
+        } else {
+            if (toggleBtnText) toggleBtnText.innerText = '도장 찍기 (완료)';
+            if (toggleBtn) toggleBtn.className = 'px-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-bold text-sm shadow-md transition-all flex-1 flex items-center justify-center gap-2';
+        }
+
+        const modal = document.getElementById('quest-modal');
+        const modalCard = document.getElementById('modal-card');
+        if (modal && modalCard) {
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modalCard.classList.remove('scale-95', 'opacity-0');
+                modalCard.classList.add('scale-100', 'opacity-100');
+            }, 10);
+        }
+    }
+
+    function closeModal() {
+        const modal = document.getElementById('quest-modal');
+        const modalCard = document.getElementById('modal-card');
+        if (!modal || !modalCard) return;
+
+        modalCard.classList.remove('scale-100', 'opacity-100');
+        modalCard.classList.add('scale-95', 'opacity-0');
+        setTimeout(() => {
+            modal.classList.add('hidden');
+            activeModalLevelId = null;
+        }, 150);
+    }
+
+    /* 
+     * Toggle Quest Completion State & Save to LocalStorage
+     */
+    const toggleBtn = document.getElementById('toggle-complete-btn');
+    if (toggleBtn) {
+        toggleBtn.addEventListener('click', () => {
+            if (activeModalLevelId === null) return;
+
+            if (completedSet.has(activeModalLevelId)) {
+                completedSet.delete(activeModalLevelId);
+            } else {
+                completedSet.add(activeModalLevelId);
+            }
+
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(Array.from(completedSet)));
+
+            renderRoadmapNodes();
+            updateProgress();
+            closeModal();
+        });
+    }
+
+    /* 
+     * Reset Progress Confirmation
+     */
+    function confirmReset() {
+        if (completedSet.size === 0) {
+            alert('완료된 도장 기록이 없습니다.');
+            return;
+        }
+        if (window.confirm('모든 도장깨기 기록을 초기화하시겠습니까?')) {
+            completedSet.clear();
+            localStorage.removeItem(STORAGE_KEY);
+            renderRoadmapNodes();
+            updateProgress();
+        }
+    }
+</script>
+</body>
+</html>

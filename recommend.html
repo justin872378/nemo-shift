@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>오늘의 종이접기 추천 | 네모의 변신</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+    
+    body {
+      font-family: 'Pretendard', sans-serif;
+      /* 따뜻한 종이 느낌 연회색 배경 */
+      background-color: #FDFBF7;
+      /* 모눈종이(Grid) 패턴 배경 */
+      background-image: 
+        linear-gradient(to right, rgba(15, 23, 42, 0.03) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(15, 23, 42, 0.03) 1px, transparent 1px);
+      background-size: 24px 24px;
+    }
+
+    /* 종이 상자 스타일 카드 */
+    .origami-box {
+      background: #FFFFFF;
+      border: 2px solid #0F172A;
+      box-shadow: 8px 8px 0px #E2E8F0, 8px 8px 0px 2px #0F172A;
+    }
+
+    .paper-btn {
+      box-shadow: 3px 3px 0px #0F172A;
+      transition: all 0.15s ease;
+    }
+    .paper-btn:hover {
+      transform: translate(-2px, -2px);
+      box-shadow: 5px 5px 0px #0F172A;
+    }
+    .paper-btn:active {
+      transform: translate(2px, 2px);
+      box-shadow: 1px 1px 0px #0F172A;
+    }
+  </style>
+</head>
+<body class="text-slate-800 antialiased min-h-screen flex flex-col justify-between relative overflow-x-hidden">
+
+  <!-- 은은한 종이접기 데코레이션 이모지 배경 -->
+  <div class="absolute top-20 left-10 text-4xl opacity-10 select-none pointer-events-none rotate-12">📄</div>
+  <div class="absolute top-40 right-12 text-5xl opacity-10 select-none pointer-events-none -rotate-12">✈️</div>
+  <div class="absolute bottom-20 left-16 text-5xl opacity-10 select-none pointer-events-none -rotate-45">📐</div>
+  <div class="absolute bottom-32 right-20 text-4xl opacity-10 select-none pointer-events-none rotate-12">🗡️</div>
+
+  <!-- Header -->
+  <header class="bg-white/80 backdrop-blur-md border-b border-slate-200 py-4 px-6 relative z-10">
+    <div class="max-w-5xl mx-auto flex justify-between items-center">
+      <a href="index.html" class="flex items-center gap-2 group">
+        <div class="w-8 h-8 bg-amber-400 rounded-md flex items-center justify-center font-black text-slate-900 border border-slate-900 group-hover:rotate-12 transition-transform">
+          N
+        </div>
+        <span class="font-extrabold text-lg tracking-tight">네모의 변신</span>
+      </a>
+      <a href="index.html" class="text-sm font-bold text-slate-600 hover:text-slate-900 flex items-center gap-1 transition-colors">
+        <i data-lucide="arrow-left" class="w-4 h-4"></i> 메인으로 돌아가기
+      </a>
+    </div>
+  </header>
+
+  <!-- Main Content Area -->
+  <main class="max-w-4xl mx-auto px-4 py-12 w-full my-auto relative z-10">
+    
+    <!-- Title Area (종이접기 글씨 주황색 강조) -->
+    <div class="text-center mb-10 space-y-3">
+      <div class="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-100 border border-amber-300 rounded-full text-xs font-bold text-amber-800 mb-1">
+        <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
+        <span>오늘의 추천 종이접기</span>
+      </div>
+      <h1 class="text-4xl md:text-5xl font-black text-slate-900 tracking-tight">
+        오늘의 <span class="text-amber-500 underline decoration-amber-300 decoration-wavy decoration-2">종이접기</span> 추천
+      </h1>
+      <p class="text-slate-500 text-sm md:text-base font-medium">
+        직접 큐레이션한 재미있는 종이접기 작품을 골라드려요!
+      </p>
+    </div>
+
+    <!-- Main Card Container (2개의 틀 구조) -->
+    <div class="origami-box rounded-2xl p-6 md:p-8 grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 items-center">
+      
+      <!-- 틀 1: 영상 썸네일 -->
+      <div class="relative group aspect-video bg-slate-100 rounded-xl overflow-hidden border-2 border-slate-900 shadow-inner">
+        <img id="itemThumbnail" src="" alt="종이접기 작품 썸네일" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+        <a id="itemPlayLink" href="#" target="_blank" class="absolute inset-0 bg-slate-900/30 flex items-center justify-center opacity-90 group-hover:opacity-100 transition-opacity">
+          <div class="w-14 h-14 bg-amber-400 border-2 border-slate-900 rounded-full flex items-center justify-center text-slate-900 shadow-[3px_3px_0px_#000]">
+            <i data-lucide="play" class="w-7 h-7 fill-slate-900 ml-1"></i>
+          </div>
+        </a>
+      </div>
+
+      <!-- 틀 2: 영상 정보 및 설명 -->
+      <div class="flex flex-col justify-between space-y-4">
+        <div class="space-y-3">
+          <div class="flex items-center gap-2">
+            <span id="itemCreator" class="text-xs font-bold px-2.5 py-1 rounded-md bg-amber-100 text-amber-800 border border-amber-300">
+              유튜브 채널명
+            </span>
+            <span id="itemTarget" class="text-xs font-semibold text-slate-500">
+              난이도/특징
+            </span>
+          </div>
+          
+          <h2 id="itemTitle" class="text-xl md:text-2xl font-extrabold text-slate-900 leading-snug">
+            작품 제목
+          </h2>
+          
+          <p id="itemDesc" class="text-slate-600 text-sm leading-relaxed">
+            작품 설명
+          </p>
+        </div>
+
+        <div class="space-y-4 pt-2">
+          <!-- 태그 모음 -->
+          <div id="itemTags" class="flex flex-wrap gap-1.5">
+            <!-- JavaScript로 동적 삽입 -->
+          </div>
+
+          <!-- 링크 버튼 -->
+          <a id="itemLink" href="#" target="_blank" class="paper-btn block text-center bg-amber-400 hover:bg-amber-300 text-slate-900 font-extrabold text-sm py-3 rounded-xl border-2 border-slate-900 flex items-center justify-center gap-2">
+            <span>유튜브에서 영상 보기</span>
+            <i data-lucide="external-link" class="w-4 h-4"></i>
+          </a>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- Random Refresh Button -->
+    <div class="text-center mt-10">
+      <button onclick="pickRandomItem()" class="paper-btn bg-slate-900 hover:bg-slate-800 text-white font-bold text-sm px-6 py-3.5 rounded-xl border-2 border-slate-900 inline-flex items-center gap-2">
+        <i data-lucide="shuffle" class="w-4 h-4 text-amber-400"></i>
+        <span>다른 추천 작품 보기</span>
+      </button>
+    </div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-white/60 text-slate-500 py-6 text-center text-xs border-t border-slate-200/80 relative z-10">
+    <p>© 네모의 변신 (nemo-shift) - 최고의 종이접기 큐레이션 서비스</p>
+  </footer>
+
+  <!-- JavaScript Logic -->
+  <script>
+    // 수작업으로 등록하는 추천 종이접기 데이터베이스
+    const origamiData = [
+      {
+        title: "움직이는 장난감-칼 접기, 쉬운 종이접기",
+        creator: "색종이 연구소 origami",
+        target: "쉬운 접기 / 색종이 1장",
+        desc: "색종이 1장으로 쉽게 만들어 가지고 놀 수 있는 움직이는 장난감 칼, 검 접기 방법입니다.",
+        thumbnail: "https://img.youtube.com/vi/JGflVaoYXSY/hqdefault.jpg",
+        url: "https://youtu.be/JGflVaoYXSY?si=TSynjvmfqO05rOnj",
+        tags: ["칼", "움직이는", "색종이1장"]
+      },
+      {
+  title: "쉬운 하트 요술봉 종이접기/Easy origami magic wand",
+  creator: "색종이 연구소 origami",
+  target: "입문 / 쉬운접기",
+  desc: "색종이로 장난감 만들기! 색종이 2장으로 만드는 예쁜 요술봉입니다.",
+  thumbnail: "https://img.youtube.com/vi/ZUjBGPYdnec/hqdefault.jpg",
+  url: "https://www.youtube.com/watch?v=ZUjBGPYdnec",
+  tags: ["요술봉", "색종이2장", "장난감"]
+},
+{
+  title: "색종이로 노랑이(인간형캐릭터) 접는방법(사람 종이접기)",
+  creator: "네모아저씨",
+  target: "중급 / 캐릭터",
+  desc: "스티브나 좀비 같은 마인크래프트 캐릭터의 기본이 되는 인간형 종이접기 노랑이 접는 방법입니다.",
+  thumbnail: "https://img.youtube.com/vi/d9YF2_1FnAU/hqdefault.jpg",
+  url: "https://www.youtube.com/watch?v=d9YF2_1FnAU",
+  tags: ["색종이", "사람"]
+},
+{
+  title: "[종이쌤 창작] 역대급 미니카! 드래곤 날개를 가진 드래곤 미니카접기 !",
+  creator: "종이쌤",
+  target: "초급 / 미니카",
+  desc: "색종이 한 장으로 접는 완전 멋있는 드래곤 미니카 종이접기입니다.",
+  thumbnail: "https://img.youtube.com/vi/S-h8-JcBMsk/hqdefault.jpg",
+  url: "https://www.youtube.com/watch?v=S-h8-JcBMsk",
+  tags: ["드래곤", "미니카", "날개"]
+},
+{
+  title: "색종이로 도마뱀 접는방법(종이접기) / 네모아저씨 (Origami Lizard )",
+  creator: "네모아저씨",
+  target: "중급 / 동물",
+  desc: "색종이 한 장을 접기만 해서 입체 도마뱀을 완성해 보는 재미있는 동물 종이접기입니다.",
+  thumbnail: "https://img.youtube.com/vi/o8kuqZHkhaM/hqdefault.jpg",
+  url: "https://www.youtube.com/watch?v=o8kuqZHkhaM",
+  tags: ["색종이", "도마뱀"]
+},
+{
+  title: "멋지고 쉬운 용 종이 접기/ Easy origami dragon.",
+  creator: "색종이 연구소",
+  target: "쉬운 / 용·전설",
+  desc: "색종이 1장으로 용 접기! 용 길들이기는 못하지만 용접기는 할 수 있어요~",
+  thumbnail: "https://img.youtube.com/vi/hq_S_T715UA/hqdefault.jpg",
+  url: "https://www.youtube.com/watch?v=hq_S_T715UA",
+  tags: ["용", "멋지고 쉬운"]
+},
+{
+  title: "[풀있어야됨] \"딱지\"에서 \"큐브\"로 변신하는 \"매직큐브\" 접는방법(Origami transformation magic cube)",
+  creator: "네모아저씨",
+  target: "중급 / 장난감",
+  desc: "딱지에서 큐브로 변하는 매직큐브에요. 색종이는 2장이 필요하고 풀도 있어야 된답니다. 종이접기이면서 만들기이기도 해요!",
+  thumbnail: "https://img.youtube.com/vi/n1IJuzn9xno/hqdefault.jpg",
+  url: "https://www.youtube.com/watch?v=n1IJuzn9xno",
+  tags: ["매직큐브", "딱지"]
+},
+ {
+    title: "Tesla Cyber Truck 테슬라 사이버 트럭 종이접기 / 자동차 접기 / car origami",
+    creator: "종이접는 도토리",
+    target: "쉬움 / 탈것",
+    desc: "테슬라의 사이버트럭 살 수 없다면 종이로 만든다!! 색종이 한장으로 사이버트럭을 만들어 봤습니다. 미래지향적인 디자인이 굉장히 마음에 드는 자동차죠. 각진 부분이 가장 큰 특징입니다. 접는 법은        어렵지 않고 굉장히 쉬울 수 있습니다 영상을 보시면서 접어보세요~ 구독과 좋아요 부탁해요~",
+    thumbnail: "https://img.youtube.com/vi/tzUx2uK4YMY/hqdefault.jpg",
+    url: "https://www.youtube.com/watch?v=tzUx2uK4YMY",
+    tags: ["테슬라 사이버 트럭", "자동차"]
+  },
+{
+  title: "학접기 블록 접기",
+  creator: "페이퍼빌드",
+  target: "기초 / 블록",
+  desc: "페이퍼빌드",
+  thumbnail: "https://img.youtube.com/vi/5saMIOJHo4o/hqdefault.jpg",
+  url: "https://www.youtube.com/watch?v=5saMIOJHo4o",
+  tags: ["학접기", "기초"]
+},
+{
+  title: "어몽어스 로봇 만드는 방법 (종이접기) 페이퍼빌드",
+  creator: "페이퍼빌드",
+  target: "고급 / 캐릭터",
+  desc: "요즘 인기인 어몽어스의 로봇 버전 종이접기입니다. 만들어달라는 요청이 너무 많아서 한번 해봤습니다. 만들다보니 욕심이 생겨서 난이도가 조금 있습니다.",
+  thumbnail: "https://img.youtube.com/vi/jhCPvdzv1uw/hqdefault.jpg",
+  url: "https://www.youtube.com/watch?v=jhCPvdzv1uw",
+  tags: ["어몽어스", "로봇", "페이퍼빌드"]
+},
+{
+  title: "종이접기 초급 상어 만들기 블루샤크 (페이퍼빌드)",
+  creator: "페이퍼빌드",
+  target: "초급 / 동물",
+  desc: "페이퍼빌드 종이접기 초급난이도 상어 만들기입니다.",
+  thumbnail: "https://img.youtube.com/vi/DWbUuelNO2g/hqdefault.jpg",
+  url: "https://www.youtube.com/watch?v=DWbUuelNO2g",
+  tags: ["상어", "초급 난이도"]
+},
+{
+  title: "[신작!!!] 종이접기 로봇 빌드 SD 뼈대 접기 페이퍼빌드",
+  creator: "페이퍼빌드",
+  target: "중급 / 로봇",
+  desc: "종이로봇을 SD화 시켜봤습니다!. 블럭고 적고 만들기 쉽고 생각보다 멋지네요",
+  thumbnail: "https://img.youtube.com/vi/U53R2kT7lxc/hqdefault.jpg",
+  url: "https://www.youtube.com/watch?v=U53R2kT7lxc",
+  tags: ["SD", "로봇", "신작"]
+},
+{
+  title: "전설의 포켓몬 아르세우스 종이접기 (페이퍼빌드)",
+  creator: "페이퍼빌드",
+  target: "중고급 / 포켓몬",
+  desc: "이번 페이퍼빌드 종이접기는 요청이 가장 많은 아르세우스입니다.",
+  thumbnail: "https://img.youtube.com/vi/JTrCc9jBeBc/hqdefault.jpg",
+  url: "https://www.youtube.com/watch?v=JTrCc9jBeBc",
+  tags: ["아르세우스", "포켓몬"]
+},
+{
+  title: "전설의 포켓몬 기라티나 종이접기 (페이퍼빌드)",
+  creator: "페이퍼빌드",
+  target: "고급 / 포켓몬",
+  desc: "드래곤 접다보니 어디서 본것같은 포켓몬이?? 이번엔 전설 포켓몬 기라티나 종이접기입니다.",
+  thumbnail: "https://img.youtube.com/vi/BfbayznZvnE/hqdefault.jpg",
+  url: "https://www.youtube.com/watch?v=BfbayznZvnE",
+  tags: ["기라티나", "포켓몬"]
+},
+{
+  title: "주술회전 마허라 종이접기 로봇 (페이퍼빌드,타이탄뼈대)",
+  creator: "페이퍼빌드",
+  target: "고급 / 로봇·캐릭터",
+  desc: "주술회전에 등장하는 마허라입니다. 난이도를 줄이긴했지만 그래도 조금 어렵네요! 도전해보세요",
+  thumbnail: "https://img.youtube.com/vi/PJLoCaVZRwo/hqdefault.jpg",
+  url: "https://www.youtube.com/watch?v=PJLoCaVZRwo",
+  tags: ["마허라", "주술회전"]
+},
+{
+  title: "[페빌](중급) 새시리즈 종이로봇 빌드나이트2 나이트 제로 (필수뼈대 강의 , 페이퍼빌드)",
+  creator: "페이퍼빌드",
+  target: "중급 / 로봇",
+  desc: "좋아요 수가 많을수록 다음 시리즈 늘어납니다.",
+  thumbnail: "https://img.youtube.com/vi/cGt__QAk4TY/hqdefault.jpg",
+  url: "https://www.youtube.com/watch?v=cGt__QAk4TY",
+  tags: ["중급", "새시리즈", "빌드나이트2"]
+},
+{
+  title: "[페빌]중급 종이로봇 빌드포스2 포스어쌔신",
+  creator: "페이퍼빌드",
+  target: "중급 / 로봇",
+  desc: "빌드x 의 뼈대 강의처럼 뼈대 강의를 통합하기로 했습니다. 모든 포스2 시리즈 뼈대는 이 강의를 보고 제작해주세요. 좋아요 수가 많을수록 다음 시리즈늘어납니다.",
+  thumbnail: "https://img.youtube.com/vi/oRKLJwXar18/hqdefault.jpg",
+  url: "https://www.youtube.com/watch?v=oRKLJwXar18",
+  tags: ["빌드포스x", "어쌔신"]
+},
+{
+  title: "건담 에어리얼 개수형 만드는 영상 | 건담 수성의 마녀",
+  creator: "페이퍼빌드",
+  target: "고급 / 로봇·건담",
+  desc: "건담 수성의 마녀라는 애니메이션에 등장하는 건담 에어리얼의 개수형입니다.",
+  thumbnail: "https://img.youtube.com/vi/Y_YXVLRYBls/hqdefault.jpg",
+  url: "https://www.youtube.com/watch?v=Y_YXVLRYBls",
+  tags: ["에어리얼", "건담 수성의 마녀"]
+}
+
+      // 추후 추천할 새로운 작품들을 이곳에 아래 형태로 계속 추가하시면 됩니다:
+      /*
+      ,{
+        title: "작품 제목",
+        creator: "유튜브 채널명",
+        target: "난이도 / 설명",
+        desc: "작품 설명",
+        thumbnail: "https://img.youtube.com/vi/유튜브비디오ID/hqdefault.jpg",
+        url: "유튜브주소",
+        tags: ["태그1", "태그2"]
+      },
+
+      */
+    ];
+
+    let lastIndex = -1;
+
+    function pickRandomItem() {
+      let randomIndex;
+      if (origamiData.length === 1) {
+        randomIndex = 0;
+      } else {
+        do {
+          randomIndex = Math.floor(Math.random() * origamiData.length);
+        } while (randomIndex === lastIndex);
+      }
+      
+      lastIndex = randomIndex;
+      const item = origamiData[randomIndex];
+
+      // DOM 업데이트
+      document.getElementById('itemThumbnail').src = item.thumbnail;
+      document.getElementById('itemTitle').innerText = item.title;
+      document.getElementById('itemCreator').innerText = `👤 ${item.creator}`;
+      document.getElementById('itemTarget').innerText = `🎯 ${item.target}`;
+      document.getElementById('itemDesc').innerText = item.desc;
+      
+      document.getElementById('itemPlayLink').href = item.url;
+      document.getElementById('itemLink').href = item.url;
+
+      // 태그 변환
+      const tagsContainer = document.getElementById('itemTags');
+      tagsContainer.innerHTML = item.tags
+        .map(tag => `<span class="text-xs bg-amber-50 text-amber-800 px-2.5 py-1 rounded-md font-semibold border border-amber-200">#${tag}</span>`)
+        .join('');
+
+      lucide.createIcons();
+    }
+
+    // 페이지 진입 시 최초 1회 실행
+    document.addEventListener('DOMContentLoaded', () => {
+      pickRandomItem();
+    });
+  </script>
+</body>
+</html>
