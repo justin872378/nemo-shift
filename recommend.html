@@ -43,6 +43,31 @@
     }
   </style>
 </head>
+
+<!-- Header & Navigation -->
+<header class="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-slate-200">
+  <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
+    <!-- Logo -->
+    <a href="index.html" class="flex items-center gap-2 group">
+      <div class="w-8 h-8 bg-amber-400 rounded-md flex items-center justify-center font-black text-slate-900 border border-slate-900 group-hover:rotate-12 transition-transform">
+        N
+      </div>
+      <span class="font-extrabold text-xl tracking-tight">네모의 변신 <span class="text-xs text-amber-600 font-mono">nemo-shift</span></span>
+    </a>
+
+    <!-- Menu Links -->
+    <nav class="hidden md:flex items-center gap-6 text-sm font-semibold text-slate-600">
+      <a href="recommend.html" class="text-amber-600 font-bold hover:text-amber-500 transition-colors">오늘의 종이접기 추천</a>
+      <a href="quest.html" class="hover:text-amber-500 transition-colors">종이접기 도장깨기 퀘스트</a>
+    </nav>
+
+    <!-- Action Button -->
+    <button onclick="pickRandomItem()" class="paper-btn bg-amber-400 hover:bg-amber-300 text-slate-900 font-bold text-sm px-4 py-2 rounded-lg border border-slate-900 flex items-center gap-2">
+      <i data-lucide="shuffle" class="w-4 h-4"></i>
+      <span>랜덤 변신</span>
+    </button>
+  </div>
+</header>
 <body class="text-slate-800 antialiased min-h-screen flex flex-col justify-between relative overflow-x-hidden">
 
   <!-- 은은한 종이접기 데코레이션 이모지 배경 -->
@@ -51,21 +76,7 @@
   <div class="absolute bottom-20 left-16 text-5xl opacity-10 select-none pointer-events-none -rotate-45">📐</div>
   <div class="absolute bottom-32 right-20 text-4xl opacity-10 select-none pointer-events-none rotate-12">🗡️</div>
 
-  <!-- Header -->
-  <header class="bg-white/80 backdrop-blur-md border-b border-slate-200 py-4 px-6 relative z-10">
-    <div class="max-w-5xl mx-auto flex justify-between items-center">
-      <a href="index.html" class="flex items-center gap-2 group">
-        <div class="w-8 h-8 bg-amber-400 rounded-md flex items-center justify-center font-black text-slate-900 border border-slate-900 group-hover:rotate-12 transition-transform">
-          N
-        </div>
-        <span class="font-extrabold text-lg tracking-tight">네모의 변신</span>
-      </a>
-      <a href="index.html" class="text-sm font-bold text-slate-600 hover:text-slate-900 flex items-center gap-1 transition-colors">
-        <i data-lucide="arrow-left" class="w-4 h-4"></i> 메인으로 돌아가기
-      </a>
-    </div>
-  </header>
-
+  
   <!-- Main Content Area -->
   <main class="max-w-4xl mx-auto px-4 py-12 w-full my-auto relative z-10">
     

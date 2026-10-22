@@ -71,44 +71,45 @@
 <body class="text-slate-800 min-h-screen flex flex-col justify-between">
 
     <!-- Navigation Header -->
-    <header class="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-slate-200/80 paper-shadow">
-        <div class="max-w-5xl mx-auto px-4 py-3.5 flex items-center justify-between">
-            <!-- Logo -->
-            <a href="index.html" class="flex items-center gap-2.5 group">
-                <div class="w-9 h-9 bg-amber-500 text-white flex items-center justify-center rounded-lg shadow-md transform group-hover:rotate-12 transition-transform duration-300">
-                    <i class="fa-solid fa-paper-plane text-lg"></i>
-                </div>
-                <span class="text-xl font-black text-slate-800 tracking-tight">nemo-shift <span class="text-amber-500 font-normal text-sm">| 네모의 변신</span></span>
-            </a>
+<header class="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-slate-200/80 paper-shadow">
+    <div class="max-w-5xl mx-auto px-4 py-3.5 flex items-center justify-between">
+        <!-- Logo -->
+        <a href="index.html" class="flex items-center gap-2.5 group">
+            <div class="w-9 h-9 bg-amber-400 text-slate-900 border border-slate-900 flex items-center justify-center rounded-lg shadow-md transform group-hover:rotate-12 transition-transform duration-300 font-black">
+                N
+            </div>
+            <span class="text-xl font-black text-slate-800 tracking-tight">네모의 변신 <span class="text-xs text-amber-600 font-mono">nemo-shift</span></span>
+        </a>
 
-            <!-- Menu Links -->
-            <nav class="hidden md:flex items-center gap-6 text-sm font-bold text-slate-600">
-                <a href="index.html" class="hover:text-amber-500 transition-colors">홈 (색인)</a>
-                <a href="recommend.html" class="hover:text-amber-500 transition-colors">오늘의 추천</a>
-                <a href="quest.html" class="text-amber-500 border-b-2 border-amber-500 pb-0.5">도장깨기 퀘스트 🏆</a>
-            </nav>
+        <!-- Menu Links -->
+        <nav class="hidden md:flex items-center gap-6 text-sm font-semibold text-slate-600">
+            <a href="recommend.html" class="hover:text-amber-500 transition-colors">오늘의 종이접기 추천</a>
+            <a href="quest.html" class="text-amber-600 font-bold transition-colors">종이접기 도장깨기 퀘스트</a>
+        </nav>
 
-            <!-- Reset Stats Button -->
+        <!-- Right Actions (Reset Button) -->
+        <div class="flex items-center gap-3">
             <button id="reset-btn" onclick="confirmReset()" class="text-xs text-slate-400 hover:text-rose-500 flex items-center gap-1 transition-colors px-2.5 py-1.5 rounded-lg border border-slate-200 hover:border-rose-200">
                 <i class="fa-solid fa-rotate-left"></i>
                 <span>기록 초기화</span>
             </button>
         </div>
+    </div>
 
-        <!-- Quest Overall Progress Bar -->
-        <div class="bg-slate-100 border-t border-slate-200/60 py-2">
-            <div class="max-w-5xl mx-auto px-4 flex items-center gap-4">
-                <div class="text-xs font-bold text-slate-600 whitespace-nowrap flex items-center gap-1.5">
-                    <i class="fa-solid fa-award text-amber-500 text-sm"></i>
-                    <span>전체 달성도: <span id="progress-text" class="text-amber-600 font-extrabold">0/20</span></span>
-                </div>
-                <div class="flex-1 bg-slate-200 h-3 rounded-full overflow-hidden p-0.5 shadow-inner">
-                    <div id="progress-bar" class="bg-gradient-to-r from-amber-400 to-amber-500 h-full rounded-full transition-all duration-500" style="width: 0%;"></div>
-                </div>
-                <span id="progress-percent" class="text-xs font-black text-slate-700 w-10 text-right">0%</span>
+    <!-- Quest Overall Progress Bar -->
+    <div class="bg-slate-100 border-t border-slate-200/60 py-2">
+        <div class="max-w-5xl mx-auto px-4 flex items-center gap-4">
+            <div class="text-xs font-bold text-slate-600 whitespace-nowrap flex items-center gap-1.5">
+                <i class="fa-solid fa-award text-amber-500 text-sm"></i>
+                <span>전체 달성도: <span id="progress-text" class="text-amber-600 font-extrabold">0 / 20</span></span>
             </div>
+            <div class="flex-1 bg-slate-200 h-3 rounded-full overflow-hidden p-0.5 shadow-inner">
+                <div id="progress-bar" class="bg-gradient-to-r from-amber-400 to-amber-500 h-full rounded-full transition-all duration-500" style="width: 0%;"></div>
+            </div>
+            <span id="progress-percent" class="text-xs font-black text-slate-700 w-10 text-right">0%</span>
         </div>
-    </header>
+    </div>
+</header>
 
     <main class="max-w-4xl mx-auto px-4 py-8 flex-1 w-full relative">
         <!-- Hero Title Banner -->
